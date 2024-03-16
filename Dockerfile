@@ -7,6 +7,8 @@
 ################################
 FROM python:3.12.2-slim as python-base
 
+USER nonroot
+
     # Python
 ENV PYTHONUNBUFFERED=1 \
     # pip
@@ -43,7 +45,7 @@ ENV PYTHONPATH="/app:$PYTHONPATH"
 ################################
 FROM python-base as builder-base
 RUN apt-get update && \
-    apt-get install -y \
+    apt-get --no-install-recommends install install -y \
     apt-transport-https \
     gnupg \
     ca-certificates \
