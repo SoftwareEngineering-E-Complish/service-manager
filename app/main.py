@@ -13,11 +13,11 @@ from app.config import (
 )
 
 QUERY_SCHEMA_ENDPOINT = QUERY_SCHEMA_ENDPOINT_TEMPLATE.format(
-    "inventory-service"
+    "http://inventory-service"
 )
-LLM_QUERY_ENDPOINT = LLM_QUERY_ENDPOINT_TEMPLATE.format("llm-service:8888")
+LLM_QUERY_ENDPOINT = LLM_QUERY_ENDPOINT_TEMPLATE.format("http://llm-service:8888")
 PROPERTY_QUERY_ENDPOINT = PROPERTY_QUERY_ENDPOINT_TEMPLATE.format(
-    "inventory-service"
+    "http://inventory-service"
 )
 INTERNAL_SERVER_ERROR = 500
 
