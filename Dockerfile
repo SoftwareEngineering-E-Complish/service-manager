@@ -7,11 +7,6 @@
 ################################
 FROM python:3.12.2-slim as python-base
 
-RUN addgroup -S nonroot \
-    && adduser -S nonroot -G nonroot
-
-USER nonroot
-
     # Python
 ENV PYTHONUNBUFFERED=1 \
     # pip
@@ -71,23 +66,6 @@ RUN --mount=type=cache,target=/root/.cache \
     poetry install --no-root --only main
 COPY app/ app/
 
-
-################################
-# DEVELOPMENT
-# Image used during development / testing
-################################
-FROM builder-base as development
-
-WORKDIR /app
-
-# quicker install as runtime deps are already installed
-RUN --mount=type=cache,target=/root/.cache \
-    poetry install --no-root --with test,lint
-
-EXPOSE 8000
-CMD ["bash"]
-
-
 ################################
 # PRODUCTION
 # Final image used for runtime
@@ -108,5 +86,10 @@ COPY poetry.lock pyproject.toml ./
 COPY app/ app/
 
 EXPOSE 8000
+
+RUN addgroup -S nonroot \
+    && adduser -S nonroot -G nonroot
+
+USER nonroot
 
 CMD ["python", "app/main.py"]
