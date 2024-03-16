@@ -1,5 +1,5 @@
 import httpx
-from models import LLMQuery
+from app.models import LLMQuery
 
 
 def fetch_json(endpoint: str, params: dict | None = None) -> dict | None:

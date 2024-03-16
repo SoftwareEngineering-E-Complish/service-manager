@@ -10,17 +10,7 @@ class TestUtils(unittest.TestCase):
         # Mock the response from the endpoint
         mock_post.return_value.status_code = 200
         mock_post.return_value.json.return_value = {
-            "propertyId": 1,
-            "title": "Luxury Apartment in Zurich",
-            "description": "This is a luxury apartment located in the heart of Zurich.",
-            "price": 2000000,
-            "location": "Zurich",
-            "bedrooms": 3,
-            "bathrooms": 2,
-            "square_meters": 100,
-            "year_built": 2000,
-            "property_type": "Apartment",
-            "done": True,
+            "content": '{"value":"key"}'
         }
 
         # Call the method with sample data
@@ -31,20 +21,8 @@ class TestUtils(unittest.TestCase):
         # Assert the returned values
         self.assertEqual(status_code, 200)
         self.assertIsNotNone(llm_query)
-        self.assertEqual(llm_query.propertyId, 1)
-        self.assertEqual(llm_query.title, "Luxury Apartment in Zurich")
-        self.assertEqual(
-            llm_query.description,
-            "This is a luxury apartment located in the heart of Zurich.",
-        )
-        self.assertEqual(llm_query.price, 2000000)
-        self.assertEqual(llm_query.location, "Zurich")
-        self.assertEqual(llm_query.bedrooms, 3)
-        self.assertEqual(llm_query.bathrooms, 2)
-        self.assertEqual(llm_query.square_meters, 100)
-        self.assertEqual(llm_query.year_built, 2000)
-        self.assertEqual(llm_query.property_type, "Apartment")
-        self.assertEqual(llm_query.done, True)
+        self.assertEqual(llm_query.content, '{"value":"key"}')
+
 
     @patch("app.utils.httpx.post")
     def test_get_data_from_llm_failure(self, mock_post):

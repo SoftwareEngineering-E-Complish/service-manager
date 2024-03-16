@@ -1,14 +1,14 @@
 import logging
 
-from config import (
+from app.config import (
     LLM_QUERY_ENDPOINT_TEMPLATE,
     PROPERTY_QUERY_ENDPOINT_TEMPLATE,
     QUERY_SCHEMA_ENDPOINT_TEMPLATE,
 )
+from app.models import InventoryRequest
+from app.utils import fetch_json, get_data_from_llm
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from models import InventoryRequest
-from utils import fetch_json, get_data_from_llm
 
 # CONSTANTS
 QUERY_SCHEMA_ENDPOINT = QUERY_SCHEMA_ENDPOINT_TEMPLATE.format(
