@@ -7,6 +7,9 @@
 ################################
 FROM python:3.12.2-slim as python-base
 
+RUN addgroup -S nonroot \
+    && adduser -S nonroot -G nonroot
+
 USER nonroot
 
     # Python
