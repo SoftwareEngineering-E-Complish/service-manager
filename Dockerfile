@@ -43,7 +43,7 @@ ENV PYTHONPATH="/app:$PYTHONPATH"
 ################################
 FROM python-base as builder-base
 RUN apt-get update && \
-    apt-get --no-install-recommends install install -y \
+    apt-get --no-install-recommends install -y \
     apt-transport-https \
     gnupg \
     ca-certificates \
@@ -73,7 +73,7 @@ COPY app/ app/
 FROM python-base as production
 
 RUN DEBIAN_FRONTEND=noninteractive apt-get update && \
-    apt-get install -y --no-install-recommends \
+    apt-get --no-install-recommends install -y \
     ca-certificates && \
     apt-get clean
 
