@@ -87,9 +87,4 @@ COPY app/ app/
 
 EXPOSE 8000
 
-RUN addgroup -S nonroot \
-    && adduser -S nonroot -G nonroot
-
-USER nonroot
-
 CMD ["python", "app/main.py"]
