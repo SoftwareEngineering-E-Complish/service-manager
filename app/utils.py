@@ -1,6 +1,6 @@
 import logging
 import httpx
-from config import TOKEN_VERIFICATION_ENDPOINT
+from app.config import TOKEN_VERIFICATION_ENDPOINT
 from fastapi import HTTPException, Request
 from fastapi.responses import Response
 
