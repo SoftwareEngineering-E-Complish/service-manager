@@ -139,7 +139,7 @@ async def list_properties(user_query: str):
     return inventory_res
 
 
-@app.get("/user_properties")
+@app.get("/fetchPropertiesByUser")
 def get_user_properties(request: Request):
     auth_token = request.headers.get("Authorization")
 
