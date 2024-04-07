@@ -1,15 +1,17 @@
 import logging
+
 import httpx
-from app.config import TOKEN_VERIFICATION_ENDPOINT
 from fastapi import HTTPException, Request
 from fastapi.responses import Response
 
+from app.config import TOKEN_VERIFICATION_ENDPOINT
 from app.models import LLMQuery
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
 
+# TODO: Refact to fetch_data and add json and text options
 def fetch_json(endpoint: str, params: dict | None = None) -> dict | None:
     res = httpx.get(endpoint, params=params)
 
@@ -17,6 +19,32 @@ def fetch_json(endpoint: str, params: dict | None = None) -> dict | None:
         return None
 
     return res.json()
+
+
+def fetch_text(endpoint: str, params: dict | None = None) -> str | None:
+    res = httpx.get(endpoint, params=params)
+
+    if res.status_code != 200:
+        return None
+
+    return res.text
+
+
+def post_data(
+        endpoint: str,
+        content: dict | None = None,
+        params: dict | None = None,
+        files: dict | None = None,
+        return_json: bool = True
+    ) -> dict | str | None:
+    res = httpx.post(endpoint, params=params, json=content, files=files)
+
+    logger.info(res.text)
+
+    if res.status_code != 200:
+        return None
+
+    return res.json() if return_json else res.text
 
 
 def get_data_from_llm(endpoint: str, data: dict) -> tuple[int, LLMQuery | None]:
@@ -35,15 +63,20 @@ def get_data_from_llm(endpoint: str, data: dict) -> tuple[int, LLMQuery | None]:
 
 async def _reverse_proxy(call_url: str, request: Request):
     query = request.url.query.encode("utf-8")
-    
+
     url = httpx.URL(
         path=request.url.path,
         query=query if query else None,
     )
 
     async with httpx.AsyncClient(base_url=f"http://{call_url}") as client:
-        rp_req = client.build_request(request.method, url, headers=request.headers.raw)
-        logger.info(f'Redirect URL = {rp_req}')
+        rp_req = client.build_request(
+            request.method,
+            url,
+            headers=request.headers.raw,
+            content=await request.body(),
+        )
+        logger.info(f"Redirect URL = {rp_req.url}")
         rp_resp = await client.send(rp_req)
 
         return Response(
@@ -53,9 +86,8 @@ async def _reverse_proxy(call_url: str, request: Request):
         )
 
 
-async def _reverse_auth_proxy(call_url: str, request: Request):
-    token = request.headers.get("Authorization")
-
+def raise_for_invalid_token(token: str | None):
+    """Raise HTTPException when the token is invalid"""
     if token is None:
         raise HTTPException(
             status_code=401,
@@ -66,10 +98,27 @@ async def _reverse_auth_proxy(call_url: str, request: Request):
         TOKEN_VERIFICATION_ENDPOINT, params={"accessToken": token}
     )
 
-    if auth_response.text == "false":
+    if auth_response.json() is not True:
         raise HTTPException(
             status_code=401,
             detail="Invalid authorization token.",
         )
 
+
+async def _reverse_auth_proxy(call_url: str, request: Request):
+    token = request.headers.get("Authorization")
+
+    raise_for_invalid_token(token)
+
     return await _reverse_proxy(call_url, request)
+
+
+def require_auth_token(func):
+    async def wrapper(call_url: str, request: Request):
+        token = request.headers.get("Authorization")
+
+        raise_for_invalid_token(token)
+
+        return await func(call_url, request)
+
+    return wrapper
