@@ -2,3 +2,5 @@ fastapi==0.110.0
 uvicorn==0.25.0
 httpx
 PyYAML==6.0.1
+pytest
+python-multipart==0.0.9
