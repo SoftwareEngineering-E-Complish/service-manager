@@ -136,6 +136,9 @@ async def list_properties(user_query: str):
 
     logger.info(f"Fetched data from inventory = {inventory_res}")
 
+    # Add filters to the response
+    inventory_res['filters'] = llm_query.get_parsed_params()
+
     return inventory_res
 
 
