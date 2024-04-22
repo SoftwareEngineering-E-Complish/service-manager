@@ -55,6 +55,15 @@ app.add_route(
 app.add_route(
     "/queryProperties", partial(_reverse_proxy, INVENTORY_SERVICE_URL), methods=["GET"]
 )
+app.add_route(
+    "/declareInterest", partial(_reverse_proxy, INVENTORY_SERVICE_URL), methods=["POST", "DELETE"]
+)
+app.add_route(
+    "/fetchInterestsByUser", partial(_reverse_proxy, INVENTORY_SERVICE_URL), methods=["GET"]
+)
+app.add_route(
+    "/fetchInterestsByProperty", partial(_reverse_proxy, INVENTORY_SERVICE_URL), methods=["GET"]
+)
 # Inventory service with authorization
 app.add_route(
     "/properties",
