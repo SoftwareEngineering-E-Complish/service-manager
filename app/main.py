@@ -1,3 +1,4 @@
+import os
 import json
 import logging
 from functools import partial
@@ -8,7 +9,7 @@ from app.config import (IMAGE_SERVICE_URL, INVENTORY_SERVICE_URL,
                         LLM_QUERY_ENDPOINT, PROPERTIES_BY_USER_ENDPOINT,
                         PROPERTY_QUERY_ENDPOINT, QUERY_SCHEMA_ENDPOINT,
                         UPLOAD_IMAGE_ENDPOINT, USER_ID_ENDPOINT,
-                        USER_SERVICE_URL)
+                        USER_SERVICE_URL, GEOLOCATION_API_URL)
 from app.models import InventoryRequest
 from app.utils import (_reverse_auth_proxy, _reverse_proxy, fetch_json,
                        fetch_text, get_data_from_llm, post_data,
@@ -20,6 +21,8 @@ from starlette.datastructures import UploadFile
 LOG_CONFIG_PATH = Path(__file__).parent / "log_config.yaml"
 
 INTERNAL_SERVER_ERROR = 500
+
+GEOLOCATION_API_KEY = os.environ['GEOLOCATION_API_ACCESS_KEY']
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
@@ -191,10 +194,23 @@ async def post_create_property(request: Request):
 
     images = form.getlist("images")
 
+    geolocation_query = f"{inventory_data['address']} {inventory_data['location']}"
+
+    geolocation_res = fetch_json(GEOLOCATION_API_URL, params=dict(key=GEOLOCATION_API_KEY, q=geolocation_query, format="json"))
+
+    if geolocation_res is None:
+        raise HTTPException(
+            status_code=404,
+            detail="Couldn't fetch coordinates of a location.",
+        )
+    
+    coords = geolocation_res[0]
+    
+    inventory_data["longitude"] = float(coords["lon"])
+    inventory_data["latitude"] = float(coords["lat"])
+
     inv_resp = post_data(f"http://{INVENTORY_SERVICE_URL}/properties/", inventory_data)
 
-    assert isinstance(inv_resp, dict), f'Actual type = {type(inv_resp)}'
-    
     logger.info(inv_resp)
 
     if inv_resp is None:
@@ -202,6 +218,8 @@ async def post_create_property(request: Request):
             status_code=INTERNAL_SERVER_ERROR,
             detail="Error when creating new property.",
         )
+
+    assert isinstance(inv_resp, dict), f'Actual type = {type(inv_resp)}'
 
     for id_, img in enumerate(images):
         assert isinstance(img, UploadFile)
@@ -220,6 +238,7 @@ async def post_create_property(request: Request):
 
     return inv_resp
 
+# https://us1.locationiq.com/v1/search?key=Your_API_Access_Token&q=221b%2C%20Baker%20St%2C%20London%20&format=json&    
 
 if __name__ == "__main__":
     uvicorn.run(
