@@ -22,7 +22,7 @@ LOG_CONFIG_PATH = Path(__file__).parent / "log_config.yaml"
 
 INTERNAL_SERVER_ERROR = 500
 
-GEOLOCATION_API_KEY = os.environ['GEOLOCATION_API_ACCESS_KEY']
+GEOLOCATION_API_KEY = os.environ.get('GEOLOCATION_API_ACCESS_KEY')
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
