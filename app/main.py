@@ -56,7 +56,10 @@ app.add_route(
     "/queryProperties", partial(_reverse_proxy, INVENTORY_SERVICE_URL), methods=["GET"]
 )
 app.add_route(
-    "/declareInterest", partial(_reverse_proxy, INVENTORY_SERVICE_URL), methods=["POST", "DELETE"]
+    "/declareInterest", partial(_reverse_proxy, INVENTORY_SERVICE_URL), methods=["POST"]
+)
+app.add_route(
+    "/removeInterest", partial(_reverse_proxy, INVENTORY_SERVICE_URL), methods=["DELETE"]
 )
 app.add_route(
     "/fetchInterestsByUser", partial(_reverse_proxy, INVENTORY_SERVICE_URL), methods=["GET"]
