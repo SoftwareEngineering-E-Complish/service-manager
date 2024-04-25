@@ -73,6 +73,11 @@ app.add_route(
     partial(_reverse_auth_proxy, INVENTORY_SERVICE_URL),
     methods=["POST"],
 )
+app.add_route(
+    "/properties/{path:path}",
+    partial(_reverse_auth_proxy, INVENTORY_SERVICE_URL),
+    methods=["PUT"],
+)
 
 
 # User service without authorization
@@ -245,7 +250,7 @@ async def post_create_property(request: Request):
         if res is None:
             raise HTTPException(
                 status_code=INTERNAL_SERVER_ERROR,
-                detail=f"Error when uploading image for a property with id = {inv_resp["propertyId"]}.",
+                detail=f"Error when uploading image for a property with id = {inv_resp['propertyId']}.",
             )
 
     return inv_resp
@@ -310,6 +315,6 @@ if __name__ == "__main__":
     uvicorn.run(
         "main:app",
         host="0.0.0.0",
-        port=8000,
+        port=8004,
         log_config=str(LOG_CONFIG_PATH),
     )
