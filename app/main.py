@@ -12,7 +12,7 @@ from app.config import (IMAGE_SERVICE_URL, INVENTORY_SERVICE_URL,
                         USER_SERVICE_URL, GEOLOCATION_API_URL)
 from app.models import InventoryRequest
 from app.utils import (_reverse_auth_proxy, _reverse_proxy, fetch_json,
-                       fetch_text, get_data_from_llm, post_data,
+                       fetch_text, get_data_from_llm, post_data, put_data,
                        raise_for_invalid_token)
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
@@ -249,6 +249,58 @@ async def post_create_property(request: Request):
             )
 
     return inv_resp
+
+
+@app.post("/updateProperty/{property_id}")
+async def post_create_property(request: Request, property_id: int):
+    auth_token = request.headers.get("Authorization")
+
+    raise_for_invalid_token(auth_token)
+
+    user_id = fetch_text(USER_ID_ENDPOINT, dict(accessToken=auth_token))
+
+    if user_id is None:
+        raise HTTPException(
+            status_code=404,
+            detail="Couldn't fetch userId.",
+        )
+
+    form = await request.form()
+
+    inventory_data = json.loads(str(form["content"]))
+    inventory_data["owner"] = user_id
+
+    del inventory_data["images"]
+
+    geolocation_query = f"{inventory_data['address']} {inventory_data['location']}"
+
+    geolocation_res = fetch_json(GEOLOCATION_API_URL, params=dict(key=GEOLOCATION_API_KEY, q=geolocation_query, format="json"))
+
+    if geolocation_res is None:
+        raise HTTPException(
+            status_code=404,
+            detail="Couldn't fetch coordinates of a location.",
+        )
+    
+    coords = geolocation_res[0]
+    
+    inventory_data["longitude"] = float(coords["lon"])
+    inventory_data["latitude"] = float(coords["lat"])
+
+    inv_resp = put_data(f"http://{INVENTORY_SERVICE_URL}/properties/{property_id}", inventory_data)
+
+    logger.info(inv_resp)
+
+    if inv_resp is None:
+        raise HTTPException(
+            status_code=INTERNAL_SERVER_ERROR,
+            detail="Error when creating new property.",
+        )
+
+    assert isinstance(inv_resp, dict), f'Actual type = {type(inv_resp)}'
+
+    return inv_resp
+
 
 # https://us1.locationiq.com/v1/search?key=Your_API_Access_Token&q=221b%2C%20Baker%20St%2C%20London%20&format=json&    
 
