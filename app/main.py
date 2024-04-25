@@ -303,7 +303,6 @@ async def put_update_property(request: Request, property_id: int):
             detail="Error when creating new property.",
         )
 
-    return inv_resp
 
 
 # https://us1.locationiq.com/v1/search?key=Your_API_Access_Token&q=221b%2C%20Baker%20St%2C%20London%20&format=json&    
