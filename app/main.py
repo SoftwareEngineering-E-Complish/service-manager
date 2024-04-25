@@ -251,8 +251,8 @@ async def post_create_property(request: Request):
     return inv_resp
 
 
-@app.post("/updateProperty/{property_id}")
-async def post_create_property(request: Request, property_id: int):
+@app.put("/updateProperty/{property_id}")
+async def put_update_property(request: Request, property_id: int):
     auth_token = request.headers.get("Authorization")
 
     raise_for_invalid_token(auth_token)
