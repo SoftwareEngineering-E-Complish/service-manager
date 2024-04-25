@@ -270,9 +270,10 @@ async def put_update_property(request: Request, property_id: int):
             detail="Couldn't fetch userId.",
         )
 
-    form = await request.form()
+    form = await request.json()
 
-    inventory_data = json.loads(str(form["content"]))
+    inventory_data = form.get("content")
+
     inventory_data["owner"] = user_id
 
     del inventory_data["images"]
