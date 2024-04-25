@@ -266,7 +266,9 @@ async def put_update_property(request: Request, property_id: int):
         )
 
     form = await request.form()
-
+    print(form.keys())
+    logger.info(form)
+    logger.info(form["content"])
     inventory_data = json.loads(str(form["content"]))
     inventory_data["owner"] = user_id
 
