@@ -303,8 +303,6 @@ async def put_update_property(request: Request, property_id: int):
             detail="Error when creating new property.",
         )
 
-    assert isinstance(inv_resp, dict), f'Actual type = {type(inv_resp)}'
-
     return inv_resp
 
 
