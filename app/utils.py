@@ -46,6 +46,22 @@ def post_data(
 
     return res.json() if return_json else res.text
 
+def put_data(
+        endpoint: str,
+        content: dict | None = None,
+        params: dict | None = None,
+        files: dict | None = None,
+    ) -> dict | str | None:
+    res = httpx.put(endpoint, params=params, json=content, files=files)
+
+    logger.info(res.text)
+
+    if res.status_code != 200:
+        return None
+
+    return res.text
+
+
 
 def get_data_from_llm(endpoint: str, data: dict) -> tuple[int, LLMQuery | None]:
     res = httpx.post(
