@@ -302,6 +302,7 @@ async def put_update_property(request: Request, property_id: int):
             status_code=INTERNAL_SERVER_ERROR,
             detail="Error when creating new property.",
         )
+    return inv_resp
 
 
 
