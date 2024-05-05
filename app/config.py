@@ -1,8 +1,8 @@
 # URLs
 INVENTORY_SERVICE_URL = "inventory-service"
-LLM_SERVICE_URL = "llm-service:8888"
-USER_SERVICE_URL = "user-manager:8080"
-IMAGE_SERVICE_URL = "image-service:8080"
+LLM_SERVICE_URL = "llm-service:8001"
+USER_SERVICE_URL = "user-manager:8005"
+IMAGE_SERVICE_URL = "image-service:8006"
 GEOLOCATION_API_URL = "https://us1.locationiq.com/v1/search"
 
 # Endpoint templates
