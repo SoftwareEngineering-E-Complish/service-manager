@@ -11,7 +11,6 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
 
-# TODO: Refact to fetch_data and add json and text options
 def fetch_json(endpoint: str, params: dict | None = None) -> dict | None:
     res = httpx.get(endpoint, params=params)
 
