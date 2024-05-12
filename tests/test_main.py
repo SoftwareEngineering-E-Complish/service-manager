@@ -22,7 +22,7 @@ class TestApp(unittest.IsolatedAsyncioTestCase):
         result = await list_properties("user_query")
 
         # Assert the returned value
-        self.assertEqual(result, {"param1": "value1", "param2": "value2"})
+        self.assertEqual(result, {"param1": "value1", "param2": "value2", 'filters': {'param1': 'value1', 'param2': 'value2'}})
 
     @patch("app.main.fetch_json")
     @patch("app.main.get_data_from_llm")
